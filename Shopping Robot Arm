@@ -1,0 +1,171 @@
+import RPi.GPIO as GPIO
+import time
+
+# Set up GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+
+# Define GPIO pins for stepper motors
+STEPPER_ELBOW = [7, 8, 11, 9]  # Example pins for stepper motor 1
+STEPPER_SHOULDER = [25, 24, 23, 22]     # Example pins for stepper motor 2
+servo_pin = 18
+
+# Define sequence for full step mode
+SEQ = [[1, 0, 0, 1],
+       [1, 0, 0, 0],
+       [1, 1, 0, 0],
+       [0, 1, 0, 0],
+       [0, 1, 1, 0],
+       [0, 0, 1, 0],
+       [0, 0, 1, 1],
+       [0, 0, 0, 1]]
+
+# Define GPIO pins for the keypad
+KEYPAD_ROWS = [5, 6, 12, 13]
+KEYPAD_COLS = [19, 16, 26, 20]
+KEYS = [
+    ['1', '2', '3', 'A'],
+    ['4', '5', '6', 'B'],
+    ['7', '8', '9', 'C'],
+    ['*', '0', '#', 'D']
+]
+
+# Setup GPIO pins for stepper motors
+for pins in [STEPPER_ELBOW, STEPPER_SHOULDER]:
+    for pin in pins:
+        GPIO.setup(pin, GPIO.OUT)
+
+# Setup GPIO pins for keypad rows as inputs with pull-up resistors
+for row_pin in KEYPAD_ROWS:
+    GPIO.setup(row_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# Setup GPIO pins for keypad cols as outputs
+for col_pin in KEYPAD_COLS:
+    GPIO.setup(col_pin, GPIO.OUT)
+
+GPIO.setup(servo_pin, GPIO.OUT)
+pwm = GPIO.PWM(servo_pin, 50)  # PWM frequency (Hz), adjust as needed
+pwm.start(0)
+
+def set_angle(angle):
+    duty = angle / 18 + 2
+    GPIO.output(servo_pin, True)
+    pwm.ChangeDutyCycle(duty)
+    time.sleep(1)
+    GPIO.output(servo_pin, False)
+    pwm.ChangeDutyCycle(0)
+
+# Function to move the stepper motor
+def move_stepper(pins, steps, delay):
+    for _ in range(steps):
+        for i in range(8):
+            for j in range(len(pins)):
+                GPIO.output(pins[j], SEQ[i][j])
+            time.sleep(delay)
+
+# Function to move the stepper motor in reverse
+def move_stepper_reverse(pins, steps, delay):
+    for _ in range(steps):
+        for i in range(7, -1, -1):  # Iterate through the sequence in reverse order
+            for j in range(len(pins)):
+                GPIO.output(pins[j], SEQ[i][j])
+            time.sleep(delay)
+
+# Function to scan the keypad
+def scan_keypad():
+    key_pressed = None
+    for col_num, col_pin in enumerate(KEYPAD_COLS):
+        GPIO.output(col_pin, GPIO.LOW)
+        for row_num, row_pin in enumerate(KEYPAD_ROWS):
+            if GPIO.input(row_pin) == GPIO.LOW:
+                key_pressed = KEYS[row_num][col_num]
+                while GPIO.input(row_pin) == GPIO.LOW:
+                    time.sleep(0.1)  # debounce
+        GPIO.output(col_pin, GPIO.HIGH)
+    return key_pressed
+
+
+try:
+    while True:
+        key = scan_keypad()
+        if key:
+            print("Key pressed:", key)
+            # Execute different instructions based on the key pressed
+            if key == '1':
+                move_stepper_reverse(STEPPER_ELBOW,20,0.01)
+                move_stepper(STEPPER_SHOULDER, 60, 0.01)  # Example instruction for key '1'
+                move_stepper(STEPPER_ELBOW,58,0.01)
+              
+                set_angle(180)
+                time.sleep(1)
+                
+                move_stepper_reverse(STEPPER_ELBOW,68,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER, 70, 0.01)
+                move_stepper(STEPPER_ELBOW,110,0.01)
+                
+                set_angle(140)
+                time.sleep(1)
+                
+                move_stepper(STEPPER_SHOULDER, 10, 0.01)
+                move_stepper_reverse(STEPPER_ELBOW,80,0.01)
+
+            elif key == '2':
+                move_stepper_reverse(STEPPER_ELBOW,10,0.01)
+                move_stepper(STEPPER_SHOULDER,10,0.01)
+                move_stepper(STEPPER_ELBOW,10,0.01)
+                move_stepper(STEPPER_SHOULDER,10,0.01)
+                move_stepper(STEPPER_ELBOW,10,0.01)
+                move_stepper(STEPPER_SHOULDER,10,0.01)
+                move_stepper(STEPPER_ELBOW,20,0.01)
+                move_stepper(STEPPER_SHOULDER,10,0.01)
+                move_stepper(STEPPER_ELBOW,10,0.01)
+                move_stepper(STEPPER_SHOULDER,10,0.01)
+                move_stepper(STEPPER_ELBOW,10,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER,14,0.01)
+                
+                set_angle(180)
+                time.sleep(1)
+                
+                move_stepper(STEPPER_SHOULDER,14,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,10,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER,10,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,10,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER,10,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,20,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER,10,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,10,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER,10,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,10,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER,25,0.01)
+                move_stepper(STEPPER_ELBOW,10,0.01)
+                move_stepper(STEPPER_ELBOW,70,0.01)
+                
+                set_angle(140)
+                time.sleep(1)
+                
+                move_stepper(STEPPER_SHOULDER,15,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,70,0.01)
+                #move_stepper(STEPPER_SHOULDER, 20, 0.01)  # Example instruction for key '1'
+
+
+elif key == '3': #For correction
+                #set_angle(140)
+                
+                #move_stepper_reverse(STEPPER_ELBOW,10,0.01)
+                move_stepper_reverse(STEPPER_ELBOW,3,0.01)
+                #move_stepper_reverse(STEPPER_SHOULDER, 10, 0.01)
+                #move_stepper(STEPPER_SHOULDER, 5, 0.01)
+                
+            elif key == '4': #For correction
+                move_stepper_reverse(STEPPER_ELBOW,38,0.01)
+                move_stepper_reverse(STEPPER_SHOULDER, 70, 0.01)
+                move_stepper(STEPPER_ELBOW,110,0.01)
+                set_angle(140)
+                move_stepper(STEPPER_SHOULDER, 10, 0.01)
+                move_stepper_reverse(STEPPER_ELBOW,80,0.01)
+                
+        time.sleep(0.1)  # Wait until you take the other command
+except KeyboardInterrupt:
+    pwm.stop()
+    GPIO.cleanup()
