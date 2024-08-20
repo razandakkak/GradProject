@@ -149,7 +149,7 @@ try:
                 #move_stepper(STEPPER_SHOULDER, 20, 0.01)  # Example instruction for key '1'
 
 
-elif key == '3': #For correction
+           elif key == '3': #For correction
                 #set_angle(140)
                 
                 #move_stepper_reverse(STEPPER_ELBOW,10,0.01)
