@@ -4,7 +4,7 @@ Shopping robot arm is the dream of the future, where you just sit and order your
 ## Process
 The code will be controlled by the microcontroller, that will take the input from keypad and grab a certain item to put it in a trolley.
 
-##Materials
+## Materials
 1. Raspberry Pi 3 Model B+
 2. Two stepper motors for up and down, back and forth.
 3. One servor motor for the grip.
