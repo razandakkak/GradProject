@@ -1,4 +1,4 @@
-# GradProject
+# Graduation Project **Shopping Robot Arm**
 Shopping robot arm is the dream of the future, where you just sit and order your groceries, this arm will go and bring them to you while you are waiting. This is the scope of our project; while what you will see in the python script is only automated, it can be further enhanced by integrating Artificla intelligence field such as computer vision and machine learning model.
 
 ## Process
