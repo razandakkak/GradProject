@@ -9,3 +9,6 @@ The code will be controlled by the microcontroller, that will take the input fro
 2. Two stepper motors for up and down, back and forth.
 3. One servor motor for the grip.
 4. 4x4 keyoad for user input.
+
+## Code
+The python code is designed for the hardware of our project only, while it was premitive yet it worked perfectly, the process is attached as MP4 file.
